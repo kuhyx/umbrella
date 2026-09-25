@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The status-bar icon is only named from Dart, so release resource
+     shrinking would otherwise strip it and the notification would fail. -->
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:keep="@drawable/ic_stat_umbrella" />

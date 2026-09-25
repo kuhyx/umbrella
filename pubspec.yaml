@@ -1,0 +1,41 @@
+name: umbrella
+description: "Should I take an umbrella today? One answer, once a day."
+publish_to: 'none'
+
+version: 1.0.3+1
+
+environment:
+  sdk: ^3.12.2
+
+dependencies:
+  design_system:
+    git:
+      url: https://github.com/kuhyx/utils
+      ref: design_system-v0.2.1
+      path: design_system
+  flutter:
+    sdk: flutter
+  flutter_local_notifications: 22.3.1
+  geolocator: 14.0.3
+  http: 1.6.0
+  shared_preferences: 2.5.5
+
+dev_dependencies:
+  # Generates the Android launcher icons from assets/icon/ (see
+  # python_pkg/app_icons in testsAndMisc for the shared style).
+  flutter_launcher_icons: 0.14.4
+  flutter_test:
+    sdk: flutter
+  very_good_analysis: ^11.0.0
+
+flutter:
+  uses-material-design: true
+
+flutter_launcher_icons:
+  android: true
+  ios: false
+  image_path: "assets/icon/icon.png"
+  adaptive_icon_background: "#211D1B"
+  adaptive_icon_foreground: "assets/icon/icon_foreground.png"
+  adaptive_icon_monochrome: "assets/icon/icon_monochrome.png"
+  min_sdk_android: 24

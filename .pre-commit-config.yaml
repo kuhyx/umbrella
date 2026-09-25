@@ -1,0 +1,87 @@
+# Pre-commit Configuration for umbrella
+# Install:  pre-commit install && pre-commit install --hook-type pre-push
+# Run:      pre-commit run --all-files
+
+default_stages: [pre-commit]
+fail_fast: false
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace
+        args: [--markdown-linebreak-ext=md]
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+        args: [--maxkb=2000]
+      - id: check-merge-conflict
+      - id: detect-private-key
+      - id: mixed-line-ending
+        args: [--fix=lf]
+
+  - repo: local
+    hooks:
+      # Every commit ships its own patch bump, so the release workflow's clean
+      # vX.Y.Z tag tracks HEAD instead of whatever version was last hand-edited.
+      - id: bump-patch-version
+        name: Bump patch version in pubspec.yaml
+        entry: bash scripts/bump_patch_version.sh
+        language: system
+        pass_filenames: false
+        always_run: true
+        require_serial: true
+      - id: ci-mirror
+        name: CI mirror (flutter clean, analyze, format check, test --coverage)
+        entry: bash scripts/ci_mirror.sh
+        language: system
+        pass_filenames: false
+        always_run: true
+        require_serial: true
+        stages: [manual]
+
+      # Four markdown namespaces (README / CLAUDE* / DOCS* / TODO*), plus the
+      # rule that a TODO carries "REMOVE ME AFTER FINISH" and nothing else may.
+      # Shared gate in ~/src/utils owns the namespaces and the exemption list, so
+      # one repo's idea of a valid name cannot drift from every other repo's.
+      - id: md-naming
+        name: markdown naming convention
+        entry: scripts/check_md_naming.sh
+        language: system
+        files: \.(md|markdown)$
+
+      # Every dependency on its ecosystem's newest STABLE release, exact-pinned
+      # so the question is mechanically answerable at all.
+      #
+      # `files:` is what keeps this cheap: a commit touching only source makes
+      # ZERO network requests, and manifest commits mostly hit a 6h disk cache.
+      #
+      # Runs WITHOUT --strict on purpose. Offline it degrades to the cached
+      # answer and passes with a loud banner; `--no-verify` is banned here, so
+      # a hook that hard-failed on a flaky connection would leave no way to
+      # commit at all. CI, always online, is the strict authority.
+      - id: dependency-freshness
+        name: dependencies on newest stable
+        entry: scripts/check_dependency_freshness.sh
+        language: system
+        pass_filenames: true
+        files: >-
+          (pubspec\.(yaml|lock)|pyproject\.toml|requirements.*\.txt|uv\.lock
+          |package\.json|package-lock\.json|pnpm-lock\.yaml
+          |Cargo\.(toml|lock)|go\.(mod|sum)
+          |\.fvmrc|\.nvmrc|\.python-version
+          |\.github/workflows/.*\.ya?ml)$
+
+  - repo: local
+    hooks:
+      # The only pre-push hook. Everything that used to run here is now
+      # `stages: [manual]` -- run on demand with `scripts/check_gate_stamp.sh
+      # full`, and by CI on every push. finish_auto.sh stamps HEAD after its
+      # gate; a tree without that receipt cannot leave the machine.
+      - id: gate-stamp
+        name: pushed tree passed the local gate (stamp check)
+        entry: scripts/check_gate_stamp.sh check
+        language: system
+        pass_filenames: false
+        always_run: true
+        stages: [pre-push]
