@@ -98,10 +98,10 @@ void main() {
       );
       final show = calls.firstWhere((c) => c.method == 'show');
       expect((show.arguments as Map)['title'], cannotCheck.title);
-    // Default notifier path (the real plugin, on the mocked channel).
-    calls.clear();
-    await runBackground('main', client: client);
-    expect(calls.map((c) => c.method), contains('show'));
+      // Default notifier path (the real plugin, on the mocked channel).
+      calls.clear();
+      await runBackground('main', client: client);
+      expect(calls.map((c) => c.method), contains('show'));
     },
   );
 
