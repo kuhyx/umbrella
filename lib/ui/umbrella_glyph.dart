@@ -7,7 +7,8 @@ import 'package:flutter/material.dart';
 /// Paints the icon-family umbrella: filled scalloped canopy + J handle.
 ///
 /// Geometry mirrors the `umbrella` glyph in testsAndMisc's app_icons (1024
-/// canvas), cropped to its ink box 272..752 x 272..792 -> 480 x 520.
+/// canvas). The box is 194..830 square: the umbrella plus the strike's round
+/// caps, so both states are the same size and nothing paints outside it.
 class UmbrellaGlyph extends StatelessWidget {
   /// Creates the glyph.
   const UmbrellaGlyph({
@@ -23,12 +24,12 @@ class UmbrellaGlyph extends StatelessWidget {
   /// Draws a diagonal strike when true.
   final bool crossed;
 
-  /// Height in logical pixels.
+  /// Side of the square box in logical pixels.
   final double size;
 
   @override
   Widget build(BuildContext context) => CustomPaint(
-    size: Size(size * 480 / 520, size),
+    size: Size.square(size),
     painter: _UmbrellaPainter(
       color: color,
       crossed: crossed,
@@ -36,6 +37,11 @@ class UmbrellaGlyph extends StatelessWidget {
     ),
   );
 }
+
+/// Strike ends sit at 250 and 774; the 112-wide gap stroke's round caps
+/// reach 56 further.
+const double _min = 250 - 56;
+const double _max = 774 + 56;
 
 class _UmbrellaPainter extends CustomPainter {
   _UmbrellaPainter({
@@ -53,12 +59,12 @@ class _UmbrellaPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    // Work in the glyph's own units, origin at the ink box's top-left.
-    final k = size.height / 520;
+    // Work in the glyph's own units, origin at the box's top-left.
+    final k = size.height / (_max - _min);
     canvas
       ..save()
       ..scale(k)
-      ..translate(-272, -272);
+      ..translate(-_min, -_min);
     final fill = Paint()..color = color;
     final canopy = Path()
       ..moveTo(272, 512)

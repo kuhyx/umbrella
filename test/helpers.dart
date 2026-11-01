@@ -1,4 +1,6 @@
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:umbrella/core/settings.dart';
+import 'package:umbrella/services/store.dart';
 
 /// 2026-09-25 is a Friday; hour ends are UTC but these tests use local
 /// DateTimes throughout, so the mapping is tested in whatever zone runs them.
@@ -44,3 +46,22 @@ Settings settingsWith({
     (i) => DayPlan(enabled: weekends || i < 5, leaveMin: leave, backMin: back),
   ),
 );
+
+Future<Store> storeWith(Settings s) async {
+  SharedPreferences.setMockInitialValues({});
+  final store = await Store.open();
+  await store.saveSettings(s);
+  return store;
+}
+
+/// Every weekday, all day, so "now" is always inside an outing.
+Settings allDay({Place? h}) =>
+    settingsWith(home: h, leave: 0, back: 23 * 60 + 59, weekends: true);
+
+Map<String, dynamic> wetNow({required bool wet}) {
+  final now = DateTime.now();
+  return openMeteo(
+    firstEnd: DateTime(now.year, now.month, now.day - 1, 1),
+    rain: List.generate(4, (_) => List.filled(96, wet ? 1.0 : 0.0)),
+  );
+}

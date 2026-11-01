@@ -2,7 +2,6 @@ import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:umbrella/core/settings.dart';
 import 'package:umbrella/services/store.dart';
 import 'package:umbrella/ui/place_tile.dart';
@@ -11,25 +10,6 @@ import 'package:umbrella/ui/today_screen.dart';
 import 'package:umbrella/ui/umbrella_glyph.dart';
 
 import '../helpers.dart';
-
-Future<Store> storeWith(Settings s) async {
-  SharedPreferences.setMockInitialValues({});
-  final store = await Store.open();
-  await store.saveSettings(s);
-  return store;
-}
-
-/// Every weekday, all day, so "now" is always inside an outing.
-Settings allDay({Place? h}) =>
-    settingsWith(home: h, leave: 0, back: 23 * 60 + 59, weekends: true);
-
-Map<String, dynamic> wetNow({required bool wet}) {
-  final now = DateTime.now();
-  return openMeteo(
-    firstEnd: DateTime(now.year, now.month, now.day - 1, 1),
-    rain: List.generate(4, (_) => List.filled(96, wet ? 1.0 : 0.0)),
-  );
-}
 
 Widget app(Widget home, {Key? key}) =>
     MaterialApp(key: key, theme: buildDarkTheme(), home: home);

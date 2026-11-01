@@ -45,8 +45,11 @@ class VerdictView extends StatelessWidget {
       child: Column(
         children: [
           Expanded(
+            // At most 60% of the screen width; shrinks on short screens.
             child: FittedBox(
+              fit: BoxFit.scaleDown,
               child: UmbrellaGlyph(
+                size: MediaQuery.sizeOf(context).width * 0.6,
                 crossed: !yes,
                 color: yes ? theme.colorScheme.primary : muted,
               ),
