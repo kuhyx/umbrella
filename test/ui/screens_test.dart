@@ -57,6 +57,7 @@ void main() {
     expect(find.bySemanticsLabel('☂️'), findsOneWidget);
     expect(find.textContaining('100%'), findsOneWidget);
     expect(find.bySemanticsLabel(RegExp('variants')), findsOneWidget);
+    expect(find.textContaining(RegExp('[A-Za-z]')), findsNothing);
     final glyph = t.widget<UmbrellaGlyph>(find.byType(UmbrellaGlyph));
     expect(glyph.crossed, isFalse);
     await t.tap(find.byIcon(Icons.refresh));
@@ -80,6 +81,7 @@ void main() {
     expect(find.bySemanticsLabel('🌤️'), findsOneWidget);
     expect(find.textContaining('100%'), findsOneWidget);
     expect(find.bySemanticsLabel(RegExp('📴')), findsOneWidget);
+    expect(find.textContaining(RegExp('[A-Za-z]')), findsNothing);
     expect(t.widget<UmbrellaGlyph>(find.byType(UmbrellaGlyph)).crossed, true);
   });
 

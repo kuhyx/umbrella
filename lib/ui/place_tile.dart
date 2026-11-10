@@ -91,7 +91,11 @@ class PlaceTile extends StatelessWidget {
   void _showError(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Semantics(label: message, child: const SizedBox.shrink()),
+        content: Semantics(
+          label: message,
+          excludeSemantics: true,
+          child: const Icon(Icons.error_outline),
+        ),
         behavior: SnackBarBehavior.floating,
       ),
     );

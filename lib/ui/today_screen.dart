@@ -131,6 +131,9 @@ class _TodayScreenState extends State<TodayScreen> {
       outing: outing,
       threshold: s.thresholdPct / 100,
       footer: saved.stale
+          ? '🕒 $hm · 📴'
+          : '🕒 $hm · ${saved.verdict.members}',
+      footerLabel: saved.stale
           ? 'Checked $hm · 📴 saved'
           : 'Checked $hm · ${saved.verdict.members} variants',
     );

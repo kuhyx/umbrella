@@ -19,6 +19,7 @@ class VerdictView extends StatelessWidget {
     required this.outing,
     required this.threshold,
     required this.footer,
+    required this.footerLabel,
     super.key,
   });
 
@@ -31,8 +32,11 @@ class VerdictView extends StatelessWidget {
   /// Share at which an hour counts as rainy (for the strip's colour).
   final double threshold;
 
-  /// "Checked 07:30" / offline note - spoken only.
+  /// Visible footer: check time plus variant count or the offline mark.
   final String footer;
+
+  /// Spoken footer: the same facts in words, for screen readers only.
+  final String footerLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -95,9 +99,10 @@ class VerdictView extends StatelessWidget {
           const SizedBox(height: 24),
           HourStrip(hours: verdict.hours, threshold: threshold),
           const SizedBox(height: 16),
-          // Footer - semantic only, shown as muted text with icon
+          // Footer: digits and icons shown, words spoken only.
           Semantics(
-            label: footer,
+            label: footerLabel,
+            excludeSemantics: true,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
