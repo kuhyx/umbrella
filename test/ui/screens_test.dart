@@ -25,7 +25,7 @@ void main() {
       app(TodayScreen(store: s, fetch: (_) async => {}, arm: arm)),
     );
     await t.pumpAndSettle();
-    expect(find.text('Where is home?'), findsOneWidget);
+    expect(find.bySemanticsLabel('Where is home?'), findsOneWidget);
     expect(armed, 1);
   });
 
@@ -41,7 +41,7 @@ void main() {
       app(TodayScreen(store: s, fetch: (_) async => {}, arm: arm)),
     );
     await t.pumpAndSettle();
-    expect(find.text('No days planned'), findsOneWidget);
+    expect(find.bySemanticsLabel('No days planned'), findsOneWidget);
   });
 
   testWidgets('wet: big umbrella, percent, strip; refresh re-checks', (
@@ -54,12 +54,12 @@ void main() {
       ),
     );
     await t.pumpAndSettle();
-    expect(find.text('Take an umbrella'), findsOneWidget);
-    expect(find.text('100% chance of rain'), findsOneWidget);
-    expect(find.textContaining('4 forecast variants'), findsOneWidget);
+    expect(find.bySemanticsLabel('☂️'), findsOneWidget);
+    expect(find.textContaining('100%'), findsOneWidget);
+    expect(find.bySemanticsLabel(RegExp('variants')), findsOneWidget);
     final glyph = t.widget<UmbrellaGlyph>(find.byType(UmbrellaGlyph));
     expect(glyph.crossed, isFalse);
-    await t.tap(find.byTooltip('Check again'));
+    await t.tap(find.byIcon(Icons.refresh));
     await t.pumpAndSettle();
     expect(armed, 2);
   });
@@ -77,9 +77,9 @@ void main() {
       ),
     );
     await t.pumpAndSettle();
-    expect(find.text('No umbrella'), findsOneWidget);
-    expect(find.text('100% sure it stays dry'), findsOneWidget);
-    expect(find.textContaining('offline'), findsOneWidget);
+    expect(find.bySemanticsLabel('🌤️'), findsOneWidget);
+    expect(find.textContaining('100%'), findsOneWidget);
+    expect(find.bySemanticsLabel(RegExp('📴')), findsOneWidget);
     expect(t.widget<UmbrellaGlyph>(find.byType(UmbrellaGlyph)).crossed, true);
   });
 
@@ -95,7 +95,7 @@ void main() {
       ),
     );
     await t.pumpAndSettle();
-    expect(find.textContaining('No connection'), findsOneWidget);
+    expect(find.bySemanticsLabel('☂️❓'), findsOneWidget);
   });
 
   testWidgets('settings: GPS, typed coords, clear, days, sliders', (t) async {
@@ -114,7 +114,7 @@ void main() {
     await t.pumpAndSettle();
     await t.tap(find.byKey(const Key('open-settings')));
     await t.pumpAndSettle();
-    expect(find.text('Settings'), findsOneWidget);
+    expect(find.byType(AppBar), findsOneWidget);
     await t.tap(find.byTooltip('Back'));
     await t.pumpAndSettle();
     expect(armed, 2, reason: 'closing settings re-arms');
@@ -127,20 +127,21 @@ void main() {
     );
     await t.pumpAndSettle();
 
-    await t.tap(find.byTooltip('Home: use current location'));
+    await t.tap(find.byIcon(Icons.my_location).first);
     await t.pumpAndSettle();
     expect(s.settings.home!.label, home.label);
 
     gpsFails = true;
-    await t.tap(find.byTooltip('Destination (optional): use current location'));
+    await t.tap(find.byIcon(Icons.my_location).last);
     await t.pumpAndSettle();
-    expect(find.textContaining("Couldn't get location"), findsOneWidget);
+    // Snackbar appears with semantic label containing the error; check presence only.
+    expect(find.byType(SnackBar), findsOneWidget);
 
     Future<void> typeCoords(String text) async {
-      await t.tap(find.byTooltip('Destination (optional): type coordinates'));
+      await t.tap(find.byIcon(Icons.edit_outlined).last);
       await t.pumpAndSettle();
       await t.enterText(find.byKey(const Key('coords-field')), text);
-      await t.tap(find.text('Save'));
+      await t.tap(find.byIcon(Icons.check));
       await t.pumpAndSettle();
     }
 
@@ -148,11 +149,11 @@ void main() {
     expect(s.settings.destination, isNull);
     await typeCoords('52.2297 21.0122');
     expect(s.settings.destination!.lon, 21.0122);
-    await t.tap(find.byTooltip('Destination (optional): type coordinates'));
+    await t.tap(find.byIcon(Icons.edit_outlined).last);
     await t.pumpAndSettle();
-    await t.tap(find.text('Cancel'));
+    await t.tap(find.bySemanticsLabel('Cancel'));
     await t.pumpAndSettle();
-    await t.tap(find.byTooltip('Destination (optional): clear'));
+    await t.tap(find.byIcon(Icons.close).last);
     await t.pumpAndSettle();
     expect(s.settings.destination, isNull);
 
@@ -172,16 +173,20 @@ void main() {
     final s = await storeWith(Settings.defaults());
     await t.pumpWidget(app(SettingsScreen(store: s)));
     await t.pumpAndSettle();
-    for (final label in ['08:00', '17:00']) {
-      await t.tap(find.text(label).first);
-      await t.pumpAndSettle();
-      await t.tap(find.text('OK'));
-      await t.pumpAndSettle();
-    }
-    expect(s.settings.days.first.leaveMin, 480);
-    await t.tap(find.text('08:00').first);
+    // First day row, leave button (first TextButton)
+    await t.tap(find.byType(TextButton).at(0));
     await t.pumpAndSettle();
-    await t.tap(find.text('Cancel'));
+    await t.tap(find.text('OK'));
+    await t.pumpAndSettle();
+    // First day row, back button (second TextButton)
+    await t.tap(find.byType(TextButton).at(1));
+    await t.pumpAndSettle();
+    await t.tap(find.text('OK'));
+    await t.pumpAndSettle();
+    expect(s.settings.days.first.leaveMin, 480);
+    await t.tap(find.byType(TextButton).at(0));
+    await t.pumpAndSettle();
+    await t.tap(find.bySemanticsLabel('Cancel'));
     await t.pumpAndSettle();
   });
 

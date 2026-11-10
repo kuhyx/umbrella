@@ -46,8 +46,8 @@ void main() {
   test('main check notifies a live verdict and caches it', () async {
     final s = await freshStore(settingsWith(home: home));
     await run(s, returns(payload(wet: true)));
-    expect(sent.single.title, '☂️ Take umbrella');
-    expect(sent.single.body, startsWith('100% chance of rain'));
+    expect(sent.single.title, '☂️');
+    expect(sent.single.body, startsWith('💧 100%'));
     expect(s.lastVerdict!.leave, DateTime(2026, 9, 25, 8));
     expect(s.lastVerdict!.stale, isFalse);
     expect(s.cachedForecast(home)!.fetchedAt, mainAt);
@@ -61,11 +61,7 @@ void main() {
       mainAt.subtract(const Duration(hours: 10)),
     );
     await run(s, fails);
-    expect(
-      sent.single.body,
-      '100% sure it stays dry '
-      '(offline: forecast from 10h ago)',
-    );
+    expect(sent.single.body, '✓ 100% · 📴 10h');
     expect(s.lastVerdict!.stale, isTrue);
   });
 
@@ -87,13 +83,13 @@ void main() {
     await run(s, fails, kind: CheckKind.recheck);
     expect(sent, isEmpty, reason: 'cached answer unchanged');
     await run(s, returns(payload(wet: true)), kind: CheckKind.recheck);
-    expect(sent.single.title, 'Changed: ☂️ Take umbrella');
+    expect(sent.single.title, '🔄 ☂️');
   });
 
   test('re-check without an earlier answer notifies normally', () async {
     final s = await freshStore(settingsWith(home: home));
     await run(s, returns(payload(wet: true)), kind: CheckKind.recheck);
-    expect(sent.single.title, '☂️ Take umbrella');
+    expect(sent.single.title, '☂️');
   });
 
   test('no home: main asks for it, re-check stays quiet', () async {
@@ -120,7 +116,7 @@ void main() {
   test('destination counts: dry home, wet work -> umbrella', () async {
     final s = await freshStore(settingsWith(home: home, destination: work));
     await run(s, (p) async => payload(wet: p == work));
-    expect(sent.single.title, '☂️ Take umbrella');
+    expect(sent.single.title, '☂️');
   });
 
   group('store', () {

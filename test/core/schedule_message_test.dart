@@ -61,24 +61,24 @@ void main() {
 
     test('umbrella with a wet span', () {
       final m = verdictMessage(wet, threshold: 0.3);
-      expect(m.title, '☂️ Take umbrella');
-      expect(m.body, '68% chance of rain, mostly 09:00–10:00');
+      expect(m.title, '☂️');
+      expect(m.body, '💧 68% · 09:00–10:00');
     });
 
     test('umbrella without any hour at threshold', () {
       final m = verdictMessage(wet, threshold: 0.9);
-      expect(m.body, '68% chance of rain');
+      expect(m.body, '💧 68%');
     });
 
     test('dry, flipped, and stale variants', () {
       const dry = Verdict(umbrella: false, wet: 2, members: 40, hours: []);
       expect(verdictMessage(dry, threshold: 0.3), (
-        title: 'No umbrella',
-        body: '95% sure it stays dry',
+        title: '🌤️',
+        body: '✓ 95%',
       ));
       expect(
         verdictMessage(dry, threshold: 0.3, flipped: true).title,
-        'Changed: No umbrella',
+        '🔄 🌤️',
       );
       expect(
         verdictMessage(
@@ -86,7 +86,7 @@ void main() {
           threshold: 0.3,
           staleness: const Duration(hours: 13, minutes: 5),
         ).body,
-        '95% sure it stays dry (offline: forecast from 13h ago)',
+        '✓ 95% · 📴 13h',
       );
       expect(
         verdictMessage(
@@ -94,13 +94,13 @@ void main() {
           threshold: 0.3,
           staleness: const Duration(minutes: 20),
         ).body,
-        endsWith('from 20 min ago)'),
+        endsWith('📴 20m'),
       );
     });
 
     test('fixed alerts say what to do', () {
-      expect(cannotCheck.body, contains('Look outside'));
-      expect(noHome.body, contains('home location'));
+      expect(cannotCheck.title, '☂️❓');
+      expect(noHome.title, '🏠❓');
     });
   });
 

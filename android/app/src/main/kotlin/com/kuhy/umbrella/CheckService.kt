@@ -90,7 +90,7 @@ class CheckService : Service() {
         }
         val notification = builder
             .setSmallIcon(R.drawable.ic_stat_umbrella)
-            .setContentTitle("Checking the rain…")
+            .setContentTitle("☂️ ⏳")
             .build()
         // Its own id: removing it must never remove the verdict (id 1).
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {

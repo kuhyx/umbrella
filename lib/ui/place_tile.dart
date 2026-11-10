@@ -1,7 +1,6 @@
 /// A settings row for one saved place: GPS button, manual entry, clear.
 library;
 
-import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:umbrella/core/settings.dart';
@@ -39,7 +38,7 @@ Place? parsePlace(String text) {
   return Place(lat: lat, lon: lon);
 }
 
-/// One place row.
+/// One place row - text-free, uses icons and semantic labels.
 class PlaceTile extends StatelessWidget {
   /// Creates the row.
   const PlaceTile({
@@ -51,7 +50,7 @@ class PlaceTile extends StatelessWidget {
     super.key,
   });
 
-  /// "Home" / "Destination".
+  /// "Home" / "Destination" - semantic label only.
   final String title;
 
   /// Current value.
@@ -70,59 +69,97 @@ class PlaceTile extends StatelessWidget {
     try {
       onChanged(await locate());
     } on Object catch (e) {
-      if (context.mounted) showError(context, "Couldn't get location: $e");
+      if (context.mounted) _showError(context, "Couldn't get location: $e");
     }
   }
 
   Future<void> _type(BuildContext context) async {
     final text = await showDialog<String>(
       context: context,
-      builder: (_) => _CoordsDialog(title: title, initial: place?.label ?? ''),
+      builder: (_) =>
+          _CoordsDialog(semanticLabel: title, initial: place?.label ?? ''),
     );
     if (text == null || !context.mounted) return;
     final p = parsePlace(text);
     if (p == null) {
-      showError(context, 'Use "latitude, longitude"');
+      _showError(context, 'Use "latitude, longitude"');
     } else {
       onChanged(p);
     }
   }
 
+  void _showError(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Semantics(label: message, child: const SizedBox.shrink()),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
   @override
-  Widget build(BuildContext context) => ListTile(
-    title: Text(title),
-    subtitle: Text(place?.label ?? 'Not set'),
-    contentPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-    trailing: Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        IconButton(
-          tooltip: '$title: use current location',
-          onPressed: () => _useGps(context),
-          icon: const Icon(Icons.my_location),
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final muted = theme.colorScheme.onSurfaceVariant;
+    final hasPlace = place != null;
+    return Semantics(
+      label: '$title${hasPlace ? ', ${place!.label}' : ', not set'}',
+      child: ListTile(
+        leading: Icon(
+          title == 'Home' ? Icons.home_outlined : Icons.flag_outlined,
+          color: theme.colorScheme.primary,
         ),
-        IconButton(
-          tooltip: '$title: type coordinates',
-          onPressed: () => _type(context),
-          icon: const Icon(Icons.edit_outlined),
+        title: Semantics(
+          label: title,
+          child: hasPlace
+              ? Text(place!.label, style: theme.textTheme.bodyMedium)
+              : Align(
+                  alignment: AlignmentDirectional.centerStart,
+                  child: Icon(Icons.remove, color: muted),
+                ),
         ),
-        if (onClear != null && place != null)
-          IconButton(
-            tooltip: '$title: clear',
-            onPressed: onClear,
-            icon: const Icon(Icons.close),
-          ),
-      ],
-    ),
-  );
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            IconButton(
+              onPressed: () => _useGps(context),
+              icon: const Icon(Icons.my_location),
+              iconSize: 20,
+              style: IconButton.styleFrom(
+                foregroundColor: theme.colorScheme.primary,
+              ),
+              tooltip: '', // empty - semantic label on parent
+            ),
+            IconButton(
+              onPressed: () => _type(context),
+              icon: const Icon(Icons.edit_outlined),
+              iconSize: 20,
+              style: IconButton.styleFrom(
+                foregroundColor: theme.colorScheme.primary,
+              ),
+            ),
+            if (onClear != null && hasPlace)
+              IconButton(
+                onPressed: onClear,
+                icon: const Icon(Icons.close),
+                iconSize: 20,
+                style: IconButton.styleFrom(
+                  foregroundColor: theme.colorScheme.error,
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
-/// Owns its controller, so it is disposed only after the dialog's exit
-/// animation (disposing it right after `showDialog` returns crashes it).
+/// Coordinates input dialog - text-free with semantic labels.
 class _CoordsDialog extends StatefulWidget {
-  const _CoordsDialog({required this.title, required this.initial});
+  const _CoordsDialog({required this.semanticLabel, required this.initial});
 
-  final String title;
+  final String semanticLabel;
   final String initial;
 
   @override
@@ -142,11 +179,17 @@ class _CoordsDialogState extends State<_CoordsDialog> {
 
   @override
   Widget build(BuildContext context) => AlertDialog(
-    title: Text(widget.title),
+    title: Semantics(
+      label: widget.semanticLabel,
+      child: const SizedBox.shrink(),
+    ),
     content: TextField(
       key: const Key('coords-field'),
       controller: _ctrl,
-      decoration: const InputDecoration(hintText: '52.2297, 21.0122'),
+      decoration: const InputDecoration(
+        hintText: '52.2297, 21.0122', // format example - KEEP
+        border: OutlineInputBorder(),
+      ),
       keyboardType: const TextInputType.numberWithOptions(
         signed: true,
         decimal: true,
@@ -155,11 +198,11 @@ class _CoordsDialogState extends State<_CoordsDialog> {
     actions: [
       TextButton(
         onPressed: () => Navigator.pop(context),
-        child: const Text('Cancel'),
+        child: Semantics(label: 'Cancel', child: const Icon(Icons.close)),
       ),
       TextButton(
         onPressed: () => Navigator.pop(context, _ctrl.text),
-        child: const Text('Save'),
+        child: Semantics(label: 'Save', child: const Icon(Icons.check)),
       ),
     ],
   );

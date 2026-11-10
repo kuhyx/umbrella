@@ -3,11 +3,11 @@ library;
 
 import 'dart:async';
 
-import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:umbrella/core/schedule.dart';
 import 'package:umbrella/services/check_runner.dart';
 import 'package:umbrella/services/store.dart';
+import 'package:umbrella/ui/empty_state.dart';
 import 'package:umbrella/ui/settings_screen.dart';
 import 'package:umbrella/ui/verdict_view.dart';
 
@@ -39,7 +39,6 @@ class TodayScreen extends StatefulWidget {
 
 class _TodayScreenState extends State<TodayScreen> {
   bool _loading = false;
-  bool _failed = false;
 
   @override
   void initState() {
@@ -70,10 +69,7 @@ class _TodayScreenState extends State<TodayScreen> {
       );
     }
     if (!mounted) return;
-    setState(() {
-      _loading = false;
-      _failed = result == null;
-    });
+    setState(() => _loading = false);
   }
 
   Future<void> _openSettings() async {
@@ -88,16 +84,13 @@ class _TodayScreenState extends State<TodayScreen> {
   @override
   Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(
-      title: const Text('Umbrella?'),
       actions: [
         IconButton(
-          tooltip: 'Check again',
           onPressed: _loading ? null : _refresh,
           icon: const Icon(Icons.refresh),
         ),
         IconButton(
           key: const Key('open-settings'),
-          tooltip: 'Settings',
           onPressed: _openSettings,
           icon: const Icon(Icons.settings_outlined),
         ),
@@ -112,26 +105,21 @@ class _TodayScreenState extends State<TodayScreen> {
     if (s.home == null) {
       return const EmptyState(
         icon: Icons.home_outlined,
-        title: 'Where is home?',
-        message: 'Open settings (top right) and set your home location.',
+        semanticLabel: 'Where is home?',
       );
     }
     if (outing == null) {
       return const EmptyState(
         icon: Icons.event_busy_outlined,
-        title: 'No days planned',
-        message: 'Turn on at least one day in settings.',
+        semanticLabel: 'No days planned',
       );
     }
     final saved = widget.store.lastVerdict;
     if (saved == null || saved.leave != outing.leave) {
       if (_loading) return const Center(child: CircularProgressIndicator());
-      return EmptyState(
+      return const EmptyState(
         icon: Icons.cloud_off_outlined,
-        title: "Couldn't check the rain",
-        message: _failed
-            ? 'No connection and no saved forecast. Try again later.'
-            : 'Tap refresh to check.',
+        semanticLabel: '☂️❓',
       );
     }
     final at = saved.decidedAt;
@@ -143,8 +131,8 @@ class _TodayScreenState extends State<TodayScreen> {
       outing: outing,
       threshold: s.thresholdPct / 100,
       footer: saved.stale
-          ? 'Checked $hm · offline, used a saved forecast'
-          : 'Checked $hm · ${saved.verdict.members} forecast variants',
+          ? 'Checked $hm · 📴 saved'
+          : 'Checked $hm · ${saved.verdict.members} variants',
     );
   }
 }

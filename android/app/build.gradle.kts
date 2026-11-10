@@ -18,7 +18,9 @@ val keystoreProperties = Properties().apply {
 
 android {
     namespace = "com.kuhy.umbrella"
-    compileSdk = flutter.compileSdkVersion
+    // flutter_local_notifications 23 and androidx.core 1.19 need SDK 37;
+    // Flutter's default is still 36.
+    compileSdk = maxOf(flutter.compileSdkVersion, 37)
     ndkVersion = flutter.ndkVersion
 
     compileOptions {

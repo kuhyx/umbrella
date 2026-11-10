@@ -1,11 +1,12 @@
 /// Settings: places, weekly plan, notify offset, rain threshold.
 library;
 
-import 'package:design_system/design_system.dart';
+import 'package:design_system/design_system.dart' hide SectionHeader;
 import 'package:flutter/material.dart';
 import 'package:umbrella/core/settings.dart';
 import 'package:umbrella/services/store.dart';
 import 'package:umbrella/ui/place_tile.dart';
+import 'package:umbrella/ui/section_header.dart';
 
 const _dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
@@ -61,7 +62,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
       child: Row(
         children: [
-          SizedBox(width: 48, child: Text(_dayNames[i])),
+          Semantics(
+            label: _dayNames[i],
+            child: SizedBox(width: 48, child: _WeekDots(index: i)),
+          ),
           Switch(
             key: Key('day-$i'),
             value: d.enabled,
@@ -77,7 +81,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 : null,
             child: Text(_hm(d.leaveMin)),
           ),
-          Text('→', style: TextStyle(color: muted)),
+          Icon(Icons.arrow_forward, size: 16, color: muted),
           TextButton(
             onPressed: d.enabled
                 ? () async {
@@ -94,12 +98,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('Settings')),
+      appBar: AppBar(),
       body: ListView(
         children: [
-          const SectionHeader('Places'),
+          const SectionHeader('Places', icon: Icons.place_outlined),
           PlaceTile(
             title: 'Home',
             place: _s.home,
@@ -113,11 +116,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
             onChanged: (p) => _save(_s.copyWith(destination: p)),
             onClear: () => _save(_s.copyWith(clearDestination: true)),
           ),
-          const SectionHeader('When you are out'),
+          const SectionHeader(
+            'When you are out',
+            icon: Icons.calendar_today_outlined,
+          ),
           for (var i = 0; i < 7; i++) _dayRow(i),
-          const SectionHeader('Notification'),
+          const SectionHeader(
+            'Notification',
+            icon: Icons.notifications_outlined,
+          ),
           ListTile(
-            title: Text('${_s.notifyOffsetMin} min before leaving'),
+            title: Semantics(
+              label: '${_s.notifyOffsetMin} min before leaving',
+              child: Row(
+                children: [
+                  const Icon(Icons.timer_outlined),
+                  const SizedBox(width: AppSpacing.sm),
+                  ExcludeSemantics(child: Text('${_s.notifyOffsetMin}')),
+                ],
+              ),
+            ),
             subtitle: Slider(
               value: _s.notifyOffsetMin.toDouble(),
               min: 10,
@@ -130,7 +148,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
           ),
           ListTile(
-            title: Text('Umbrella from ${_s.thresholdPct}% chance of rain'),
+            title: Semantics(
+              label: 'Umbrella from ${_s.thresholdPct}% chance of rain',
+              child: Row(
+                children: [
+                  const Icon(Icons.water_drop_outlined),
+                  const SizedBox(width: AppSpacing.sm),
+                  ExcludeSemantics(child: Text('${_s.thresholdPct}%')),
+                ],
+              ),
+            ),
             subtitle: Slider(
               value: _s.thresholdPct.toDouble(),
               min: 10,
@@ -141,19 +168,33 @@ class _SettingsScreenState extends State<SettingsScreen> {
               onChangeEnd: (v) => _save(_s.copyWith(thresholdPct: v.round())),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(AppSpacing.md),
-            child: Text(
-              'Forecast: Open-Meteo ensemble (ICON, 40 variants). The chance '
-              'is the share of variants that rain at least 0.2 mm in any '
-              'hour you are out, at home or at the destination.',
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-            ),
-          ),
         ],
       ),
+    );
+  }
+}
+
+/// Seven dots with the [index]-th one filled: a word-free weekday mark.
+class _WeekDots extends StatelessWidget {
+  const _WeekDots({required this.index});
+  final int index;
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        for (var j = 0; j < 7; j++)
+          Container(
+            width: 5,
+            height: 5,
+            margin: const EdgeInsets.only(right: 1),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: j == index ? scheme.primary : scheme.outlineVariant,
+            ),
+          ),
+      ],
     );
   }
 }
