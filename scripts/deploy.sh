@@ -20,6 +20,9 @@ set -euo pipefail
 readonly PKG="com.kuhy.umbrella"
 readonly SERIAL="${ADB_SERIAL:-23181JEGR08034}"
 readonly PHONE_DEPLOY="${PHONE_DEPLOY:-$HOME/.claude/scripts/phone_deploy.sh}"
+# Shared release signing config; key.properties is gitignored, so a fresh
+# worktree (where Ship runs this) has none and would build debug-signed.
+readonly SHARED_KEY_PROPS="${SHARED_KEY_PROPS:-$HOME/.android/release/key.properties}"
 APP_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 readonly APP_DIR
 SHOT_DIR=""
@@ -34,8 +37,17 @@ fail() {
     exit 50
 }
 
+# Link the shared key.properties into the checkout when it has none.
+ensure_signing() {
+    local props="$APP_DIR/android/key.properties"
+    [[ -e "$props" ]] && return 0
+    [[ -f "$SHARED_KEY_PROPS" ]] || fail "no $props and no $SHARED_KEY_PROPS to sign with"
+    ln -s "$SHARED_KEY_PROPS" "$props"
+}
+
 main() {
     local before after
+    ensure_signing
     before="$(installed_version)"
     SHOT_DIR="$(mktemp -d)"
     trap '[[ -n "$SHOT_DIR" ]] && rm -rf -- "$SHOT_DIR"' EXIT
