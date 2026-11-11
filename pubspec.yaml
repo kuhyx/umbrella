@@ -2,7 +2,7 @@ name: umbrella
 description: "Should I take an umbrella today? One answer, once a day."
 publish_to: 'none'
 
-version: 1.0.15+1
+version: 1.0.16+1
 
 environment:
   sdk: ^3.12.2
@@ -15,7 +15,7 @@ dependencies:
       path: design_system
   flutter:
     sdk: flutter
-  flutter_local_notifications: 23.0.0
+  flutter_local_notifications: 23.0.1
   geolocator: 14.1.2
   http: 1.6.0
   shared_preferences: 2.5.6
