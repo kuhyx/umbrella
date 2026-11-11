@@ -20,6 +20,8 @@ set -euo pipefail
 readonly PKG="com.kuhy.umbrella"
 readonly SERIAL="${ADB_SERIAL:-23181JEGR08034}"
 readonly PHONE_DEPLOY="${PHONE_DEPLOY:-$HOME/.claude/scripts/phone_deploy.sh}"
+# Ship's deploy unit passes only PATH/HOME, not the login env from ~/.zshenv.
+export ANDROID_HOME="${ANDROID_HOME:-$HOME/sdk/foss-android-sdk}"
 # Shared release signing config; key.properties is gitignored, so a fresh
 # worktree (where Ship runs this) has none and would build debug-signed.
 readonly SHARED_KEY_PROPS="${SHARED_KEY_PROPS:-$HOME/.android/release/key.properties}"
