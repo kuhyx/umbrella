@@ -31,7 +31,8 @@ export PHONE_LEASE_OWNER="${PHONE_LEASE_OWNER:-deploy:$PKG}"
 readonly SHARED_KEY_PROPS="${SHARED_KEY_PROPS:-$HOME/.android/release/key.properties}"
 APP_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 readonly APP_DIR
-SHOT_DIR=""
+# Kept after the run so the on-device result can be looked at.
+readonly SHOT="${DEPLOY_SHOT:-${XDG_CACHE_HOME:-$HOME/.cache}/umbrella-deploy/screen.png}"
 
 installed_version() {
     adb -s "$SERIAL" shell dumpsys package "$PKG" 2>/dev/null \
@@ -55,16 +56,15 @@ main() {
     local before after
     ensure_signing
     before="$(installed_version)"
-    SHOT_DIR="$(mktemp -d)"
-    trap '[[ -n "$SHOT_DIR" ]] && rm -rf -- "$SHOT_DIR"' EXIT
+    mkdir -p "$(dirname "$SHOT")"
 
-    bash "$PHONE_DEPLOY" "$APP_DIR" --release --shot "$SHOT_DIR/screen.png"
+    bash "$PHONE_DEPLOY" "$APP_DIR" --release --shot "$SHOT"
 
     after="$(installed_version)"
     [[ -n "$after" ]] || fail "$PKG not installed after deploy"
     (( after > ${before:-0} )) || fail "versionCode did not rise ($before -> $after)"
     adb -s "$SERIAL" shell pidof "$PKG" >/dev/null || fail "$PKG not running after launch"
-    echo "deploy: ok $PKG versionCode ${before:-none} -> $after"
+    echo "deploy: ok $PKG versionCode ${before:-none} -> $after (screen: $SHOT)"
 }
 
 main "$@"
