@@ -2,7 +2,7 @@
 /// answer icon, and an hour-by-hour strip for the outing only.
 library;
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:umbrella/core/schedule.dart';
 import 'package:umbrella/core/verdict.dart';
 import 'package:umbrella/ui/umbrella_glyph.dart';

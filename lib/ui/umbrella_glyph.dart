@@ -2,7 +2,7 @@
 /// struck through for "no umbrella".
 library;
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Paints the icon-family umbrella: filled scalloped canopy + J handle.
 ///

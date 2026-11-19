@@ -1,7 +1,7 @@
 /// Text-free SectionHeader replacement: icon + semantic label only.
 library;
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// A text-free section header using only an icon and semantic label.
 ///

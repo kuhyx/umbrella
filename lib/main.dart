@@ -4,8 +4,8 @@ library;
 import 'dart:ui';
 
 import 'package:design_system/design_system.dart';
-import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:material_ui/material_ui.dart';
 import 'package:umbrella/services/alarms.dart';
 import 'package:umbrella/services/notifier.dart';
 import 'package:umbrella/services/open_meteo.dart';

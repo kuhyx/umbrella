@@ -3,7 +3,7 @@ library;
 
 import 'dart:async';
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:umbrella/core/schedule.dart';
 import 'package:umbrella/services/check_runner.dart';
 import 'package:umbrella/services/store.dart';

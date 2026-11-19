@@ -1,8 +1,8 @@
 /// A settings row for one saved place: GPS button, manual entry, clear.
 library;
 
-import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:umbrella/core/settings.dart';
 
 /// Returns the phone's current (coarse) position, or throws.

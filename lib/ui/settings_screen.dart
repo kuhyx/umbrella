@@ -2,7 +2,7 @@
 library;
 
 import 'package:design_system/design_system.dart' hide SectionHeader;
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:umbrella/core/settings.dart';
 import 'package:umbrella/services/store.dart';
 import 'package:umbrella/ui/place_tile.dart';
