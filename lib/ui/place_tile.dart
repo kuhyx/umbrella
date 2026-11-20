@@ -1,27 +1,25 @@
 /// A settings row for one saved place: GPS button, manual entry, clear.
 library;
 
-import 'package:geolocator/geolocator.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:platform_location/platform_location.dart';
 import 'package:umbrella/core/settings.dart';
 
 /// Returns the phone's current (coarse) position, or throws.
 typedef Locate = Future<Place> Function();
 
-/// Default [Locate]: coarse GPS through geolocator.
+/// Default [Locate]: coarse location through the platform LocationManager.
 Future<Place> locateWithGps() async {
-  var perm = await Geolocator.checkPermission();
-  if (perm == LocationPermission.denied) {
-    perm = await Geolocator.requestPermission();
+  final platform = PlatformLocation.instance;
+  var perm = await platform.checkPermission();
+  if (perm != LocationPermissionState.granted) {
+    perm = await platform.requestPermission(precise: false);
   }
-  if (perm == LocationPermission.denied ||
-      perm == LocationPermission.deniedForever) {
+  if (perm != LocationPermissionState.granted) {
     throw StateError('Location permission denied');
   }
-  final pos = await Geolocator.getCurrentPosition(
-    locationSettings: const LocationSettings(accuracy: LocationAccuracy.low),
-  );
-  return Place(lat: pos.latitude, lon: pos.longitude);
+  final fix = await platform.currentLocation();
+  return Place(lat: fix.latitude, lon: fix.longitude);
 }
 
 /// Parses "52.2297, 21.0122" (comma and/or spaces). Null if invalid.

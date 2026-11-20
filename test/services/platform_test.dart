@@ -1,10 +1,9 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:geolocator_platform_interface/geolocator_platform_interface.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
-import 'package:plugin_platform_interface/plugin_platform_interface.dart';
+import 'package:platform_location/platform_location.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:umbrella/core/message.dart';
 import 'package:umbrella/core/schedule.dart';
@@ -21,33 +20,42 @@ const _notifications = MethodChannel(
   'dexterous.com/flutter/local_notifications',
 );
 
-class FakeGeo extends GeolocatorPlatform with MockPlatformInterfaceMixin {
+class FakeGeo extends PlatformLocation {
   FakeGeo(this.first, this.afterRequest);
 
-  final LocationPermission first;
-  final LocationPermission afterRequest;
+  final LocationPermissionState first;
+  final LocationPermissionState afterRequest;
+  bool? precise;
+  int reads = 0;
 
   @override
-  Future<LocationPermission> checkPermission() async => first;
+  Future<bool> isLocationEnabled() async => true;
 
   @override
-  Future<LocationPermission> requestPermission() async => afterRequest;
+  Future<LocationPermissionState> checkPermission() async => first;
 
   @override
-  Future<Position> getCurrentPosition({
-    LocationSettings? locationSettings,
-  }) async => Position(
-    latitude: home.lat,
-    longitude: home.lon,
-    timestamp: DateTime(2026),
-    accuracy: 1000,
-    altitude: 0,
-    altitudeAccuracy: 0,
-    heading: 0,
-    headingAccuracy: 0,
-    speed: 0,
-    speedAccuracy: 0,
-  );
+  Future<LocationPermissionState> requestPermission({
+    bool precise = true,
+  }) async {
+    this.precise = precise;
+    return afterRequest;
+  }
+
+  @override
+  Future<LocationFix> currentLocation() async {
+    reads++;
+    return LocationFix(
+      time: DateTime.utc(2026),
+      latitude: home.lat,
+      longitude: home.lon,
+      accuracy: 1000,
+    );
+  }
+
+  @override
+  Stream<LocationFix> fixes({Duration interval = Duration.zero}) =>
+      const Stream.empty();
 }
 
 void main() {
@@ -106,26 +114,44 @@ void main() {
   );
 
   group('locateWithGps', () {
-    test('granted after asking', () async {
-      GeolocatorPlatform.instance = FakeGeo(
-        LocationPermission.denied,
-        LocationPermission.whileInUse,
+    final original = PlatformLocation.instance;
+    tearDown(() => PlatformLocation.instance = original);
+
+    test('granted after asking for coarse only', () async {
+      final geo = FakeGeo(
+        LocationPermissionState.denied,
+        LocationPermissionState.granted,
       );
+      PlatformLocation.instance = geo;
       expect(await locateWithGps(), home);
+      expect(geo.precise, isFalse);
     });
 
-    test('refused', () async {
-      GeolocatorPlatform.instance = FakeGeo(
-        LocationPermission.denied,
-        LocationPermission.denied,
+    test('already granted does not ask', () async {
+      final geo = FakeGeo(
+        LocationPermissionState.granted,
+        LocationPermissionState.denied,
       );
-      expect(locateWithGps(), throwsStateError);
-      GeolocatorPlatform.instance = FakeGeo(
-        LocationPermission.deniedForever,
-        LocationPermission.deniedForever,
-      );
-      expect(locateWithGps(), throwsStateError);
+      PlatformLocation.instance = geo;
+      expect(await locateWithGps(), home);
+      expect(geo.precise, isNull);
     });
+
+    test('refused never reads a fix', () async {
+      for (final refusal in [
+        LocationPermissionState.denied,
+        LocationPermissionState.deniedForever,
+      ]) {
+        final geo = FakeGeo(LocationPermissionState.denied, refusal);
+        PlatformLocation.instance = geo;
+        await expectLater(locateWithGps(), throwsStateError);
+        expect(geo.reads, 0);
+      }
+    });
+  });
+
+  test('platform_location default is the method-channel one', () {
+    expect(PlatformLocation.instance, isA<MethodChannelPlatformLocation>());
   });
 
   test('Place equality is by value', () {
