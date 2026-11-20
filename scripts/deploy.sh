@@ -1,14 +1,12 @@
 #!/bin/bash
 
 # ============================================================================
-# Deploy umbrella for real: release build of THIS checkout (Ship runs it in
-# the worktree holding the pushed commit) + phone_deploy to the Pixel.
+# Deploy umbrella for real: release build of THIS checkout + phone_deploy to
+# the Pixel. CLAUDE.md's deploy line pulls ~/src/umbrella and runs it there:
+# phone_deploy refuses a production install from a git worktree (exit 49).
 # phone_deploy installs with `install -r` and has no uninstall / pm clear
 # path, so app data survives. Rerunning is safe: each run picks a versionCode
 # above the installed one.
-#
-# The app runs on the phone, not from ~/src/umbrella, so there is no checkout
-# to pull: building kuhy's checkout would ship whatever is dirty there.
 #
 # Health check (exit 50 on failure): after the deploy the installed
 # versionCode is higher than before and the app process is running.
@@ -27,7 +25,7 @@ export ANDROID_HOME="${ANDROID_HOME:-$HOME/sdk/foss-android-sdk}"
 # owner also lets a rerun after a failure reuse the lease it left behind.
 export PHONE_LEASE_OWNER="${PHONE_LEASE_OWNER:-deploy:$PKG}"
 # Shared release signing config; key.properties is gitignored, so a fresh
-# worktree (where Ship runs this) has none and would build debug-signed.
+# worktree has none and would build debug-signed.
 readonly SHARED_KEY_PROPS="${SHARED_KEY_PROPS:-$HOME/.android/release/key.properties}"
 APP_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 readonly APP_DIR
