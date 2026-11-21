@@ -1,7 +1,8 @@
 import 'package:design_system/design_system.dart';
-import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
+import 'package:kuhy_credit/kuhy_credit.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:umbrella/core/settings.dart';
 import 'package:umbrella/services/store.dart';
 import 'package:umbrella/ui/place_tile.dart';
@@ -192,6 +193,16 @@ void main() {
     await t.pumpAndSettle();
     await t.tap(find.bySemanticsLabel('Cancel'));
     await t.pumpAndSettle();
+  });
+
+  testWidgets('settings shows KuhyCredit at the bottom', (t) async {
+    final s = await storeWith(Settings.defaults());
+    await t.pumpWidget(app(SettingsScreen(store: s)));
+    await t.pumpAndSettle();
+    // Scroll to bottom to find the KuhyCredit
+    await t.drag(find.byType(ListView), const Offset(0, -2000));
+    await t.pumpAndSettle();
+    expect(find.byType(KuhyCredit), findsOneWidget);
   });
 
   test('parsePlace validates range and shape', () {

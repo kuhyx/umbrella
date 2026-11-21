@@ -2,7 +2,7 @@ name: umbrella
 description: "Should I take an umbrella today? One answer, once a day."
 publish_to: 'none'
 
-version: 1.0.29+1
+version: 1.0.30+1
 
 environment:
   sdk: ^3.12.2
@@ -17,6 +17,11 @@ dependencies:
     sdk: flutter
   flutter_local_notifications: 23.0.3
   http: 1.6.0
+  kuhy_credit:
+    git:
+      url: https://github.com/kuhyx/utils
+      ref: kuhy-credit-v0.3.1
+      path: kuhy_credit/flutter
   # Flutter 3.50 deprecates package:flutter/material.dart; Material lives here.
   material_ui: 1.11.1
   # Coarse "where am I" over AOSP LocationManager: no Google Play services.

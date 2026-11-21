@@ -2,6 +2,7 @@
 library;
 
 import 'package:design_system/design_system.dart' hide SectionHeader;
+import 'package:kuhy_credit/kuhy_credit.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:umbrella/core/settings.dart';
 import 'package:umbrella/services/store.dart';
@@ -169,6 +170,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
               onChangeEnd: (v) => _save(_s.copyWith(thresholdPct: v.round())),
             ),
           ),
+          const SizedBox(height: 24),
+          const Center(child: KuhyCredit()),
         ],
       ),
     );
