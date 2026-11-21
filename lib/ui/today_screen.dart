@@ -3,6 +3,7 @@ library;
 
 import 'dart:async';
 
+import 'package:design_system/design_system.dart' show KLogoSmall;
 import 'package:material_ui/material_ui.dart';
 import 'package:umbrella/core/schedule.dart';
 import 'package:umbrella/services/check_runner.dart';
@@ -84,6 +85,7 @@ class _TodayScreenState extends State<TodayScreen> {
   @override
   Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(
+      leading: const Padding(padding: EdgeInsets.all(8), child: KLogoSmall()),
       actions: [
         IconButton(
           onPressed: _loading ? null : _refresh,

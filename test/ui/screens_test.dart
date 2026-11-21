@@ -114,9 +114,11 @@ void main() {
       ),
     );
     await t.pumpAndSettle();
+    expect(find.byType(KLogoSmall), findsOneWidget, reason: 'logo on today');
     await t.tap(find.byKey(const Key('open-settings')));
     await t.pumpAndSettle();
     expect(find.byType(AppBar), findsOneWidget);
+    expect(find.byType(KLogoSmall), findsOneWidget, reason: 'logo on settings');
     await t.tap(find.byTooltip('Back'));
     await t.pumpAndSettle();
     expect(armed, 2, reason: 'closing settings re-arms');

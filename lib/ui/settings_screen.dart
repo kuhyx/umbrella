@@ -99,7 +99,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      // The logo sits in the title: `leading` holds the Back arrow here.
+      appBar: AppBar(title: const KLogoSmall()),
       body: ListView(
         children: [
           const SectionHeader('Places', icon: Icons.place_outlined),
