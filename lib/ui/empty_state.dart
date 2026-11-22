@@ -12,6 +12,7 @@ class EmptyState extends StatelessWidget {
   const EmptyState({
     required this.icon,
     required this.semanticLabel,
+    this.tooltip,
     super.key,
   });
 
@@ -21,13 +22,23 @@ class EmptyState extends StatelessWidget {
   /// Spoken label for accessibility (e.g. "Where is home?").
   final String semanticLabel;
 
+  /// Optional tooltip for the icon (one word naming the glyph).
+  final String? tooltip;
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final glyph = Icon(
+      icon,
+      size: 120,
+      color: theme.colorScheme.onSurfaceVariant,
+    );
     return Center(
       child: Semantics(
         label: semanticLabel,
-        child: Icon(icon, size: 120, color: theme.colorScheme.onSurfaceVariant),
+        child: tooltip == null
+            ? glyph
+            : Tooltip(message: tooltip, child: glyph),
       ),
     );
   }

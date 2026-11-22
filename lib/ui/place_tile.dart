@@ -131,7 +131,7 @@ class PlaceTile extends StatelessWidget {
               style: IconButton.styleFrom(
                 foregroundColor: theme.colorScheme.primary,
               ),
-              tooltip: '', // empty - semantic label on parent
+              tooltip: 'gps',
             ),
             IconButton(
               onPressed: () => _type(context),
@@ -140,6 +140,7 @@ class PlaceTile extends StatelessWidget {
               style: IconButton.styleFrom(
                 foregroundColor: theme.colorScheme.primary,
               ),
+              tooltip: 'edit',
             ),
             if (onClear != null && hasPlace)
               IconButton(
@@ -149,6 +150,7 @@ class PlaceTile extends StatelessWidget {
                 style: IconButton.styleFrom(
                   foregroundColor: theme.colorScheme.error,
                 ),
+                tooltip: 'clear',
               ),
           ],
         ),

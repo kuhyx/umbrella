@@ -104,7 +104,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
       appBar: AppBar(title: const KLogoSmall()),
       body: ListView(
         children: [
-          const SectionHeader('Places', icon: Icons.place_outlined),
+          const SectionHeader(
+            'Places',
+            icon: Icons.place_outlined,
+            tooltip: 'places',
+          ),
           PlaceTile(
             title: 'Home',
             place: _s.home,
@@ -121,18 +125,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
           const SectionHeader(
             'When you are out',
             icon: Icons.calendar_today_outlined,
+            tooltip: 'schedule',
           ),
           for (var i = 0; i < 7; i++) _dayRow(i),
           const SectionHeader(
             'Notification',
             icon: Icons.notifications_outlined,
+            tooltip: 'notify',
           ),
           ListTile(
             title: Semantics(
               label: '${_s.notifyOffsetMin} min before leaving',
               child: Row(
                 children: [
-                  const Icon(Icons.timer_outlined),
+                  const Tooltip(
+                    message: 'lead-time',
+                    child: Icon(Icons.timer_outlined),
+                  ),
                   const SizedBox(width: AppSpacing.sm),
                   ExcludeSemantics(child: Text('${_s.notifyOffsetMin}')),
                 ],
@@ -154,7 +163,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
               label: 'Umbrella from ${_s.thresholdPct}% chance of rain',
               child: Row(
                 children: [
-                  const Icon(Icons.water_drop_outlined),
+                  const Tooltip(
+                    message: 'rain',
+                    child: Icon(Icons.water_drop_outlined),
+                  ),
                   const SizedBox(width: AppSpacing.sm),
                   ExcludeSemantics(child: Text('${_s.thresholdPct}%')),
                 ],

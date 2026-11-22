@@ -10,13 +10,22 @@ import 'package:material_ui/material_ui.dart';
 /// semantics for screen readers.
 class SectionHeader extends StatelessWidget {
   /// Creates a text-free section header.
-  const SectionHeader(this.semanticLabel, {this.icon, this.padding, super.key});
+  const SectionHeader(
+    this.semanticLabel, {
+    this.icon,
+    this.tooltip,
+    this.padding,
+    super.key,
+  });
 
   /// Spoken label for accessibility.
   final String semanticLabel;
 
   /// Optional leading icon.
   final IconData? icon;
+
+  /// Optional tooltip for the icon (one word naming the glyph).
+  final String? tooltip;
 
   /// Outer padding.
   final EdgeInsetsGeometry? padding;
@@ -28,7 +37,13 @@ class SectionHeader extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         if (icon != null) ...[
-          Icon(icon, color: theme.colorScheme.primary, size: 20),
+          if (tooltip == null)
+            Icon(icon, color: theme.colorScheme.primary, size: 20)
+          else
+            Tooltip(
+              message: tooltip,
+              child: Icon(icon, color: theme.colorScheme.primary, size: 20),
+            ),
           const SizedBox(width: 8),
         ],
         // No visible text - just semantic label

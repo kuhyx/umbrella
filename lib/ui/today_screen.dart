@@ -90,11 +90,13 @@ class _TodayScreenState extends State<TodayScreen> {
         IconButton(
           onPressed: _loading ? null : _refresh,
           icon: const Icon(Icons.refresh),
+          tooltip: 'refresh',
         ),
         IconButton(
           key: const Key('open-settings'),
           onPressed: _openSettings,
           icon: const Icon(Icons.settings_outlined),
+          tooltip: 'settings',
         ),
       ],
     ),
@@ -108,12 +110,14 @@ class _TodayScreenState extends State<TodayScreen> {
       return const EmptyState(
         icon: Icons.home_outlined,
         semanticLabel: 'Where is home?',
+        tooltip: 'home',
       );
     }
     if (outing == null) {
       return const EmptyState(
         icon: Icons.event_busy_outlined,
         semanticLabel: 'No days planned',
+        tooltip: 'no-plan',
       );
     }
     final saved = widget.store.lastVerdict;
@@ -122,6 +126,7 @@ class _TodayScreenState extends State<TodayScreen> {
       return const EmptyState(
         icon: Icons.cloud_off_outlined,
         semanticLabel: '☂️❓',
+        tooltip: 'offline',
       );
     }
     final at = saved.decidedAt;

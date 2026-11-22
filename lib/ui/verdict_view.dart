@@ -64,10 +64,13 @@ class VerdictView extends StatelessWidget {
           Semantics(
             key: const Key('verdict-title'),
             label: yes ? '☂️' : '🌤️',
-            child: Icon(
-              yes ? Icons.wb_sunny_outlined : Icons.umbrella_outlined,
-              size: 48,
-              color: yes ? primary : muted,
+            child: Tooltip(
+              message: yes ? 'sun' : 'umbrella',
+              child: Icon(
+                yes ? Icons.wb_sunny_outlined : Icons.umbrella_outlined,
+                size: 48,
+                color: yes ? primary : muted,
+              ),
             ),
           ),
           const SizedBox(height: 8),
@@ -86,7 +89,10 @@ class VerdictView extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.access_time, size: 16, color: muted),
+                Tooltip(
+                  message: 'time',
+                  child: Icon(Icons.access_time, size: 16, color: muted),
+                ),
                 const SizedBox(width: 8),
                 Text(
                   // Numbers are KEEP per replacement catalogue
@@ -106,7 +112,10 @@ class VerdictView extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.info_outline, size: 14, color: muted),
+                Tooltip(
+                  message: 'info',
+                  child: Icon(Icons.info_outline, size: 14, color: muted),
+                ),
                 const SizedBox(width: 8),
                 Flexible(
                   child: Text(
