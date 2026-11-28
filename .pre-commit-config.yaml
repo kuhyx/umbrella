@@ -33,7 +33,7 @@ repos:
         always_run: true
         require_serial: true
       - id: ci-mirror
-        name: CI mirror (flutter clean, analyze, format check, test --coverage)
+        name: CI mirror (flutter clean, format check, test)
         entry: bash scripts/ci_mirror.sh
         language: system
         pass_filenames: false

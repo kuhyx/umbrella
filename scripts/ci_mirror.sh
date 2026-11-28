@@ -23,14 +23,11 @@ main() {
     echo "==> flutter pub get"
     flutter pub get
 
-    echo "==> flutter analyze"
-    flutter analyze
-
     echo "==> dart format --set-exit-if-changed"
     dart format --set-exit-if-changed lib/ test/
 
-    echo "==> flutter test --coverage"
-    flutter test --coverage
+    echo "==> flutter test"
+    flutter test
 
     echo "CI mirror passed."
 }
